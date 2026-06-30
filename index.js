@@ -8,6 +8,8 @@ import { Server } from "socket.io";
 import connectDB from "./config/db.js";
 import User from "./models/user.model.js";
 
+import authRoutes from "./routes/auth.route.js";
+
 dotenv.config();
 connectDB();
 
@@ -42,9 +44,9 @@ const socket = new Server(server, {
 
 const chatsSocket = socket.of('/chats');
 
-app.get('/', (req, res) => {
-  res.json({ message: "dddd" });
-});
+
+
+app.use("/api/auth/", authRoutes);
 
 server.listen(process.env.PORT, () => {
   console.log(`Server started Successfully in the PORT: ${process.env.PORT}`)

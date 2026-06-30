@@ -1,5 +1,5 @@
 {
-  "name": "instantgram",
+  "name": "Chatstream",
   "version": "1.0.0",
   "description": "A social media application where you can send message an d connect with others",
   "license": "ISC",
@@ -19,7 +19,8 @@
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.7.3",
-    "socket.io": "^4.8.3"
+    "socket.io": "^4.8.3",
+    "uuid": "^14.0.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"

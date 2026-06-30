@@ -1,11 +1,12 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
+import { v7 as uuidv7 } from "uuid";
 
 const userSchema = new mongoose.Schema({
   userName: {
     type: String,
+    unique: true,
     required: true,
-    unique: true
   },
   email: {
     type: String,
@@ -19,8 +20,16 @@ const userSchema = new mongoose.Schema({
   uid: {
     type: String,
     unique: true,
-    required: true
+    default: uuidv7,
   },
+  role: {
+    type: String,
+    default: "user",
+  },
+  profileURL: {
+    type: String,
+    default: "",
+  }
 }, {
   timestamps: true,
 });
