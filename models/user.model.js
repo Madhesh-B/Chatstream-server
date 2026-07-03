@@ -29,6 +29,10 @@ const userSchema = new mongoose.Schema({
   profileURL: {
     type: String,
     default: "",
+  },
+  publicId: {
+    type: String,
+    default: "",
   }
 }, {
   timestamps: true,
