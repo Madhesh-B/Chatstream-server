@@ -19,3 +19,17 @@ export const deleteUser = async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error!" });
   }
 }
+
+export const getUserProfile = async (req, res) => {
+  const { userId } = req;
+  if (!userId) return res.status(401).json({ message: "Unauthorized" });
+  const user = await User.findById(userId).select("-password");
+  if (!user) return res.status(404).json({ message: "User Data Not Found!" });
+  res.status(200).json({
+    userName: user.userName,
+    email: user.email,
+    role: user.role,
+    uid: user.uid,
+    profileURL: user.profileURL
+  });
+}

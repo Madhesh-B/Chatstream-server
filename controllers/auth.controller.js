@@ -20,6 +20,13 @@ export const Login = async (req, res) => {
       process.env.JWT_SECRET_KEY,
       { expiresIn: rememberMe ? "7d" : "3h" }
     );
+
+    res.cookie("uid", user.uid, {
+      httpOnly: false,
+      sameSite: "lax",
+      maxAge: rememberMe ? 7 * 24 * 60 * 60 * 1000 : 3 * 60 * 60 * 1000,
+    })
+
     res.cookie("token", token, {
       httpOnly: true,
       signed: true,
@@ -50,8 +57,8 @@ export const Signup = async (req, res) => {
       ]
     })
     if (isExistingUser) {
-      return res.status(409).json({ 
-        message: `${isExistingUser.userName === userName ? "Username" : "email"} is already in use!` 
+      return res.status(409).json({
+        message: `${isExistingUser.userName === userName ? "Username" : "email"} is already in use!`
       });
     }
     const user = await User.create({ userName, email, password });
