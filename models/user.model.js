@@ -33,6 +33,14 @@ const userSchema = new mongoose.Schema({
   publicId: {
     type: String,
     default: "",
+  },
+  followers: {
+    type: String,
+    default: "0",
+  },
+  following: {
+    type: String,
+    default: "0",
   }
 }, {
   timestamps: true,

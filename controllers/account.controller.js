@@ -30,6 +30,8 @@ export const getUserProfile = async (req, res) => {
     email: user.email,
     role: user.role,
     uid: user.uid,
-    profileURL: user.profileURL
+    profileURL: user.profileURL,
+    followers: user.followers,
+    following: user.following,
   });
 }
