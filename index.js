@@ -9,7 +9,7 @@ import { Server } from "socket.io";
 
 import connectDB from "./config/db.js";
 import isAuth from "./middlewares/auth.middleware.js";
-import chatSocketListener from "./controllers/chatSocket.controller.js";
+import chatSocketListener from "./sockets/chat.socket.js";
 
 import authRoutes from "./routes/auth.route.js";
 import accountRoutes from "./routes/account.route.js";
