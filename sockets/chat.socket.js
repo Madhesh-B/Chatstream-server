@@ -10,10 +10,10 @@ const chatSocketListener = (chatSocket) => {
       try {
         const senderName = await User.findOne({ uid: senderId }).select("userName");
         if (!senderName) return chatSocket.to(socket.id).emit("error_message", { message: "User Not Exist!" });
-        socket.join(chatId);
-        chatSocket.to(socket.id).emit("set_sender_info", { name: senderName.userName, chatId });
-        let chatMessages = await chats.findOne({ chatId }).select("chats");
-        if (!chatMessages) chatMessages = await chats.create({ chatId, chats: [] });
+        let chatMessages = await chats.findOne({ chatId });
+        if (!chatMessages) chatMessages = await chats.create({ chats: [] });
+        socket.join(chatMessages.chatId);
+        chatSocket.to(socket.id).emit("set_sender_info", { name: senderName.userName, chatId: chatMessages.chatId });
         chatSocket.to(socket.id).emit("prev_chat", { chats: chatMessages.chats });
       } catch (error) {
         console.log(error);
@@ -24,7 +24,7 @@ const chatSocketListener = (chatSocket) => {
     socket.on("send_message", async ({ id, content, senderId, timestamp }) => {
       if (!socket.chatId) return;
       try {
-        await chats.findOneAndUpdate({ chatId: socket.chatId }, {
+        const message = await chats.findOneAndUpdate({ chatId: socket.chatId }, {
           $push: {
             chats: {
               id,
@@ -33,11 +33,46 @@ const chatSocketListener = (chatSocket) => {
               timestamp,
             }
           }
-        });
-
+        }, { new: true });
+        if (!message) return chatSocket.to(socket.id).emit("error_message", { message: "Error in Sending the Message!" });
+        socket.to(socket.chatId).emit("recieve_message", { id, content, senderId, timestamp })
       } catch (error) {
         console.log(error);
         chatSocket.to(socket.id).emit("error_message", { message: "Error in Sending the Message!" });
+      }
+    });
+
+    socket.on("edit_message", async ({ messageId, content }) => {
+      if (!socket.chatId) return;
+      try {
+        const message = await findOneAndUpdate({ chatId: socket.chatId, "chats.id": messageId }, {
+          $set: {
+            "chats.$.content": content,
+            "chats.$.isEdited": true,
+          }
+        });
+        if (!message) return chatSocket.to(socket.id).emit("error_message", { message: "Error in Editing the Message!" });
+        socket.to(socket.chatId).emit("edit_message", { messageId, content });
+      } catch (error) {
+        console.log(error);
+        chatSocket.to(socket.id).emit("error_message", { message: "Error in Sending the Message!" });
+      }
+    });
+
+    socket.on("delete_message", async ({ messageId, senderName }) => {
+      if (!socket.chatId) return;
+      try {
+        const message = await findOneAndUpdate({ chatId: socket.chatId, "chats.id": messageId }, {
+          $set: {
+            "chats.$.content": "Deleted",
+            "chats.$.isDeleted": true,
+          }
+        });
+        if (!message) return chatSocket.to(socket.id).emit("error_message", { message: "Error in Editing the Message!" });
+        socket.to(socket.chatId).emit("delete_message", { id: messageId, senderName });
+      } catch (error) {
+        console.log(error);
+        chatSocket.to(socket.id).emit("error_message", { message: "Error in Deleting the Message!" });
       }
     });
 
