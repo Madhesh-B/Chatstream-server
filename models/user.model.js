@@ -2,6 +2,18 @@ import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import { v7 as uuidv7 } from "uuid";
 
+const chatListSchema = new mongoose.Schema({
+  chatId: {
+    type: String,
+    unique: true,
+    required: true,
+  },
+  senderId: {
+    type: String,
+    required: true,
+  }
+})
+
 const userSchema = new mongoose.Schema({
   userName: {
     type: String,
@@ -41,7 +53,11 @@ const userSchema = new mongoose.Schema({
   following: {
     type: String,
     default: "0",
-  }
+  },
+  chatList: {
+    type: [chatListSchema],
+    default: [],
+  },
 }, {
   timestamps: true,
 });

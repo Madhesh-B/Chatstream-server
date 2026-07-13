@@ -14,6 +14,7 @@ import chatSocketListener from "./sockets/chat.socket.js";
 import authRoutes from "./routes/auth.route.js";
 import accountRoutes from "./routes/account.route.js";
 import uploadRoutes from "./routes/upload.route.js";
+import chatRoutes from "./routes/chat.route.js";
 
 connectDB();
 
@@ -69,6 +70,7 @@ chatSocket.on('connection', chatSocketListener(chatSocket));
 app.use("/api/auth/", authRoutes);
 app.use("/api/account/", isAuth, accountRoutes);
 app.use("/api/upload/", isAuth, uploadRoutes);
+app.use("/api/chats/", isAuth, chatRoutes);
 
 server.listen(process.env.PORT, () => {
   console.log(`Server started Successfully in the PORT: ${process.env.PORT}`);

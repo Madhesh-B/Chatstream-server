@@ -34,7 +34,10 @@ const chatSchema = new mongoose.Schema({
     type: String,
     default: uuidv7
   },
-  chats: [messageSchema],
+  chats: {
+    type: [messageSchema],
+    default: [],
+  },
 });
 
 const chats = mongoose.model("Chats", chatSchema);
