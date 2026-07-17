@@ -7,7 +7,7 @@ import {
 
 const router = express.Router();
 
-router.delete("/delete", deleteUser);
 router.get("/profile", getUserProfile);
+router.delete("/delete", deleteUser);
 
 export default router;
