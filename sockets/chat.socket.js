@@ -33,7 +33,10 @@ const chatSocketListener = (chatSocket) => {
     });
 
     socket.on("send_message", async ({ id, content, senderId, timestamp }) => {
+      console.log(socket.chatId);
+      
       if (!socket.chatId) return;
+      console.log({ id, content, senderId, timestamp })
       try {
         const message = await chats.findOneAndUpdate({ chatId: socket.chatId }, {
           $push: {
@@ -44,7 +47,8 @@ const chatSocketListener = (chatSocket) => {
               timestamp,
             }
           }
-        }, { new: true }).select("chats -_id").sort({ createdAt: -1 }).skip(0).limit(5).lean();
+        }, { new: true }).select("chats -_id").lean();
+        
         if (!message) throw new Error("Error in Sending the Message!");
         socket.to(socket.chatId).emit("recieve_message", { id, content, senderId, timestamp })
       } catch (error) {
@@ -61,7 +65,7 @@ const chatSocketListener = (chatSocket) => {
             "chats.$.content": content,
             "chats.$.isEdited": true,
           }
-        }, { new: true }).select("chats -_id").sort({ createdAt: -1 }).skip(0).limit(5).lean();
+        }, { new: true }).select("chats -_id").lean();
         if (!message) throw new Error("Error in Editing the Message!");
         socket.to(socket.chatId).emit("edit_message", { messageId, content });
       } catch (error) {
@@ -78,7 +82,7 @@ const chatSocketListener = (chatSocket) => {
             "chats.$.content": "Deleted",
             "chats.$.isDeleted": true,
           }
-        }, { new: true }).select("chats -_id").sort({ createdAt: -1 }).skip(0).limit(5).lean();
+        }, { new: true }).select("chats -_id").sort({ createdAt: -1 }).lean();
         if (!message) throw new Error("Error in Deleting the Message!");
         socket.to(socket.chatId).emit("delete_message", { id: messageId, senderName });
       } catch (error) {

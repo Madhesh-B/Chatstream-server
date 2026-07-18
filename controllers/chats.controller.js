@@ -18,13 +18,9 @@ export const getChatList = async (req, res) => {
         };
       })
     );
+    
     chatListWithInfo = chatListWithInfo.filter((element) => element !== null);
-    chatListWithInfo.push({
-      profileURL: "https://assets.leetcode.com/users/Madhesh-B/avatar_1756132799.png",
-      senderName: "Madhesh",
-      senderId: "",
-      chatId: "",
-    });
+
     res.status(200).json(chatListWithInfo);
   } catch (error) {
     console.log(error);

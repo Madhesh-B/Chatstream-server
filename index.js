@@ -62,7 +62,6 @@ chatSocket.use((socket, next) => {
   } catch (error) {
     return next(new Error("Unauthorized"));
   }
-  next();
 });
 
 chatSocket.on('connection', chatSocketListener(chatSocket));

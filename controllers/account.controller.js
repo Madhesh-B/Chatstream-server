@@ -4,7 +4,7 @@ export const deleteUser = async (req, res) => {
   try {
     const { userId } = req;
     if (!userId) return res.status(401).json({ message: "Unauthorized" });
-    const user = await User.findByIdAndDelete(userId);
+    const user = await User.findByIdAndDelete(userId).select("uid").lean();
     if (!user) return res.status(404).json({ message: "User not found!" });
     res.clearCookie("token", token, {
       httpOnly: true,
