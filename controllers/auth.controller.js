@@ -11,7 +11,7 @@ export const Login = async (req, res) => {
         { userName },
         { email: userName }
       ]
-    }).select("-chatList -following -followers");
+    }).select("-following -followers -publicId -chatList").lean();
     if (!user) return res.status(404).json({ message: "Invalid Username or password!" });
     const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword) return res.status(401).json({ message: "Invalid Username or password!" });
@@ -55,7 +55,7 @@ export const Signup = async (req, res) => {
         { userName },
         { email },
       ]
-    }).select("userName");
+    }).select("userName -_id").lean();
     if (isExistingUser) {
       return res.status(409).json({
         message: `${isExistingUser.userName === userName ? "Username" : "email"} is already in use!`

@@ -32,6 +32,7 @@ const userSchema = new mongoose.Schema({
   uid: {
     type: String,
     unique: true,
+    index: true,
     default: uuidv7,
   },
   role: {

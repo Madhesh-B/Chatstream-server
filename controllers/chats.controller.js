@@ -4,24 +4,26 @@ import chats from "../models/chats.model.js";
 export const getChatList = async (req, res) => {
   const { userId } = req;
   try {
-    const List = await User.findById(userId).select("chatList");
-    if (List.chatList == undefined) return res.status(404).json({ message: "Chat not Found!" })
-    let chatList = List.chatList ?? [];
+    const List = await User.findById(userId).select("chatList").lean();
+    if (List == undefined) return res.status(404).json({ message: "Chat not Found!" })
+    const chatList = List.chatList ?? [];
     let chatListWithInfo = await Promise.all(
       chatList.map(async (chat) => {
-        const senderInfo = await User.findOne({ uid: chat.senderId });
+        const senderInfo = await User.findOne({ uid: chat.senderId }).select("userName profileURL -_id").lean();
         if (!senderInfo) return null;
         return {
-          ...chat.toObject(),
+          ...chat,
           senderName: senderInfo?.userName,
           profileURL: senderInfo?.profileURL,
         };
       })
     );
-    chatListWithInfo = chatListWithInfo.filter((element) => element != null);
+    chatListWithInfo = chatListWithInfo.filter((element) => element !== null);
     chatListWithInfo.push({
       profileURL: "https://assets.leetcode.com/users/Madhesh-B/avatar_1756132799.png",
       senderName: "Madhesh",
+      senderId: "",
+      chatId: "",
     });
     res.status(200).json(chatListWithInfo);
   } catch (error) {

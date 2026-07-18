@@ -7,9 +7,9 @@ const chatSocketListener = (chatSocket) => {
 
     socket.on('join_chat', async ({ chatId, senderId }) => {
       try {
-        const senderName = await User.findOne({ uid: senderId }).select("userName");
+        const senderName = await User.findOne({ uid: senderId }).select("userName -_id").lean();
         if (!senderName) throw new Error("User Not Exist!");
-        let chatMessages = await chats.findOne({ chatId });
+        let chatMessages = await chats.findOne({ chatId }).select("chatId chats").lean();
         if (!chatMessages) {
           chatMessages = await chats.create({ chats: [] });
           const userData = await User.findByIdAndUpdate(socket.userId, {
@@ -19,7 +19,7 @@ const chatSocketListener = (chatSocket) => {
                 chatId: chatMessages.chatId,
               }
             }
-          });
+          }, { new: true }).select("chats -_id").lean();
           if (!userData) throw new Error("Something Went Wrong!");
         }
         socket.chatId = chatMessages.chatId;
@@ -44,7 +44,7 @@ const chatSocketListener = (chatSocket) => {
               timestamp,
             }
           }
-        }, { new: true });
+        }, { new: true }).select("chats -_id").sort({ createdAt: -1 }).skip(0).limit(5).lean();
         if (!message) throw new Error("Error in Sending the Message!");
         socket.to(socket.chatId).emit("recieve_message", { id, content, senderId, timestamp })
       } catch (error) {
@@ -61,7 +61,7 @@ const chatSocketListener = (chatSocket) => {
             "chats.$.content": content,
             "chats.$.isEdited": true,
           }
-        });
+        }, { new: true }).select("chats -_id").sort({ createdAt: -1 }).skip(0).limit(5).lean();
         if (!message) throw new Error("Error in Editing the Message!");
         socket.to(socket.chatId).emit("edit_message", { messageId, content });
       } catch (error) {
@@ -78,7 +78,7 @@ const chatSocketListener = (chatSocket) => {
             "chats.$.content": "Deleted",
             "chats.$.isDeleted": true,
           }
-        });
+        }, { new: true }).select("chats -_id").sort({ createdAt: -1 }).skip(0).limit(5).lean();
         if (!message) throw new Error("Error in Deleting the Message!");
         socket.to(socket.chatId).emit("delete_message", { id: messageId, senderName });
       } catch (error) {
